@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:project_push_noti/page/message_page.dart';
 
 class NotificationServices {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -43,18 +45,28 @@ class NotificationServices {
     );
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (payload) {},
+      onDidReceiveNotificationResponse: (payload) {
+        handleMessage(context, message);
+      },
     );
   }
 
-  void firebaseInit() async {
-    if (kDebugMode) {
-      FirebaseMessaging.onMessage.listen((message) {
+  void firebaseInit(BuildContext context) async {
+    FirebaseMessaging.onMessage.listen((message) {
+      if (kDebugMode) {
         print(message.notification!.title.toString());
         print(message.notification!.body.toString());
+        print(message.data.toString());
+        print(message.data['type']);
+        print(message.data['id']);
+      }
+      if (Platform.isAndroid) {
+        initLocalNotification(context, message);
         ShowNotification(message);
-      });
-    }
+      } else {
+        ShowNotification(message);
+      }
+    });
   }
 
   Future<void> ShowNotification(RemoteMessage message) async {
@@ -104,5 +116,30 @@ class NotificationServices {
       event.toString();
       print("refresh");
     });
+  }
+
+  //when my application is an background and i click on those noti which i direct to my msg screen
+  Future<void> setupInteractMessage(BuildContext context) async {
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance
+        .getInitialMessage();
+    if (initialMessage != null) {
+      handleMessage(context, initialMessage);
+    }
+    //when app is on background
+    FirebaseMessaging.onBackgroundMessage((event) async {
+      handleMessage(context, event);
+    });
+  }
+
+  //redirecting to screen
+  void handleMessage(BuildContext context, RemoteMessage message) {
+    if (message.data['type'] == 'msj') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MessagePage(id: message.data['id']),
+        ),
+      );
+    }
   }
 }

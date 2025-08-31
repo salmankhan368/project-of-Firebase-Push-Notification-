@@ -12,7 +12,10 @@ class _MessagePageState extends State<MessagePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Center(child: Text("Message page" + widget.id))),
+      appBar: AppBar(
+        backgroundColor: Colors.deepPurple,
+        title: Center(child: Text("Message page" + widget.id)),
+      ),
     );
   }
 }

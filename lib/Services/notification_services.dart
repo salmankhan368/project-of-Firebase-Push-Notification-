@@ -126,14 +126,14 @@ class NotificationServices {
       handleMessage(context, initialMessage);
     }
     //when app is on background
-    FirebaseMessaging.onBackgroundMessage((event) async {
-      handleMessage(context, event);
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      handleMessage(context, message);
     });
   }
 
   //redirecting to screen
   void handleMessage(BuildContext context, RemoteMessage message) {
-    if (message.data['type'] == 'msj') {
+    if (message.data['type'] == 'msg') {
       Navigator.push(
         context,
         MaterialPageRoute(

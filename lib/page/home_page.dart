@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+
 import 'package:project_push_noti/Services/notification_services.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,9 +17,11 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     notificationServices.requestNotificationPermission();
+
     // notificationServices.isTokenRefresh();
     notificationServices.firebaseInit(context);
     notificationServices.setupInteractMessage(context);
+
     notificationServices.initLocalNotification(context, RemoteMessage());
     notificationServices
         .getDeviceToken()
